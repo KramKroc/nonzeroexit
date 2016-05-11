@@ -29,4 +29,17 @@ The application will attempt to start but fail and the java process will exit. T
 $ echo $?
 ```
 
-And you will see that the exit code is 0. If you regress to version 1.3.1.RELEASE (by modifying the springBootVersion property in the sample-service/build.gradle file) you will see that the exit code there is 1.
+And you will see that the exit code is 0. 
+
+Note that if you run the following:
+
+```sh
+$ ./gradle sample-service:bootRun
+```
+
+that the exit code there is correctly returned as 1. This indicates that the issue lies with the changes made here:
+
+https://github.com/spring-projects/spring-boot/blob/v1.3.2.RELEASE/spring-boot-tools/spring-boot-loader/src/main/java/org/springframework/boot/loader/MainMethodRunner.java
+
+If you regress to version 1.3.1.RELEASE (by modifying the springBootVersion property in the sample-service/build.gradle file) you will see that the exit code there is 1.
+
