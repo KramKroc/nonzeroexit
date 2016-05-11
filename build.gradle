@@ -1,0 +1,70 @@
+// Gradle dependencies to allow additional plugins
+//buildscript {
+//    repositories {
+//        mavenCentral()
+//    }
+//}
+        buildscript {
+            repositories {
+                mavenCentral()
+            }
+            dependencies {
+                classpath('se.transmode.gradle:gradle-docker:1.2')
+            }
+        }
+
+// Multi-project setup applicable to all projects including the root.
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+     
+    group = 'com.kramkroc'
+    version = '0.0.1-SNAPSHOT'
+}
+
+// Applicable to sub-projects but not the root project
+subprojects {
+ 
+    apply plugin: 'java'
+     
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+     
+    project.ext {
+        springBootVersion = '1.3.0.RC1'
+    }
+     
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://repo.spring.io/repo" }
+    }
+
+    dependencies {
+        testCompile("junit:junit:4.12")
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.7'
+}
+
+subprojects {
+    apply plugin: 'docker'
+    if(new File("${project.projectDir}/src/main/docker").exists()) {
+        task buildDocker(type: Docker, dependsOn: build) {
+            description 'Builds a docker image for any project that contains a docker definition file.'
+            push = false
+            applicationName = jar.baseName
+            tagVersion = 'latest'
+            dockerfile = file('src/main/docker/Dockerfile')
+            doFirst {
+                copy {
+                    from jar
+                    into stageDir
+                }
+            }
+        }
+   }
+}
+

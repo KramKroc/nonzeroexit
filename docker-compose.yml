@@ -1,0 +1,33 @@
+version: "2"
+
+services:
+  discoveryservice:
+    image: "com.kramkroc/discovery-service"
+    hostname: discoveryservice
+    ports:
+      - "8761:8761"
+
+  configserver:
+    image: "com.kramkroc/config-server"
+    hostname: configserver
+    restart: always  
+    links:
+      - discoveryservice
+    environment:
+       EUREKA_HOST: discoveryservice
+       EUREKA_PORT: 8761
+    ports:
+      - "8888:8888"
+
+  sampleservice:
+    image: "com.kramkroc/sample-service"
+    hostname: sampleservice
+    restart: on-failure:3
+    links:
+      - discoveryservice
+      - configserver
+    environment:
+       EUREKA_HOST: discoveryservice
+       EUREKA_PORT: 8761
+    ports:
+      - "8082:8082"
