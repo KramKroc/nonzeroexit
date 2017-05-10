@@ -16,6 +16,7 @@ spring:
 eureka:
   instance:
     nonSecurePort: ${server.port:8082}
+    instanceId: ${spring.cloud.client.hostname}:${spring.application.name}    
   client:
     serviceUrl:
       defaultZone: http://${eureka.host:localhost}:${eureka.port:8761}/eureka/

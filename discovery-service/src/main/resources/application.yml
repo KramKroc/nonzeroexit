@@ -2,6 +2,8 @@ server:
   port: ${PORT:8761}
 
 eureka:
+  instance:
+    instanceId: ${spring.cloud.client.hostname}:${spring.application.name}
   client:
     registerWithEureka: false
     fetchRegistry: false

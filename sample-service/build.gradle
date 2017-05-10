@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '1.3.2.RELEASE'
+        springBootVersion = '1.5.3.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -15,7 +15,7 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'spring-boot' 
+apply plugin: 'org.springframework.boot' 
 
 jar {
     baseName = 'sample-service'
@@ -42,7 +42,7 @@ dependencies {
 
 dependencyManagement {
         imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:Brixton.RELEASE"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:Camden.SR6"
             mavenBom "org.springframework.boot:spring-boot-starter-parent:$project.ext.springBootVersion"
         }
     }
@@ -56,5 +56,5 @@ eclipse {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.13'
+    gradleVersion = '3.5'
 }

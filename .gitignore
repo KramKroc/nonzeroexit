@@ -10,3 +10,20 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/.gradle/
+.settings/org.eclipse.buildship.core.prefs
+config-server/.classpath
+config-server/.gitignore
+config-server/.project
+config-server/.settings/org.eclipse.buildship.core.prefs
+config-server/.settings/org.eclipse.jdt.core.prefs
+discovery-service/.classpath
+discovery-service/.gitignore
+discovery-service/.project
+discovery-service/.settings/org.eclipse.buildship.core.prefs
+discovery-service/.settings/org.eclipse.jdt.core.prefs
+sample-service/.settings/org.eclipse.buildship.core.prefs
+sample-service/.settings/org.eclipse.jdt.core.prefs
+sample-service/.classpath
+sample-service/.gitignore
+sample-service/.project

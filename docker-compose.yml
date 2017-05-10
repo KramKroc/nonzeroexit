@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 
 services:
   discoveryservice:
@@ -6,24 +6,34 @@ services:
     hostname: discoveryservice
     ports:
       - "8761:8761"
+    networks:
+      - demo-network
+    deploy:
+      restart_policy:
+        condition: any    
 
   configserver:
     image: "com.kramkroc/config-server"
     hostname: configserver
     restart: always  
-    links:
+    depends_on:
       - discoveryservice
     environment:
        EUREKA_HOST: discoveryservice
        EUREKA_PORT: 8761
     ports:
       - "8888:8888"
+    networks:
+      - demo-network
+    deploy:
+      restart_policy:
+        condition: any      
 
   sampleservice:
     image: "com.kramkroc/sample-service"
     hostname: sampleservice
-    restart: on-failure:3
-    links:
+    restart: always
+    depends_on:
       - discoveryservice
       - configserver
     environment:
@@ -31,3 +41,12 @@ services:
        EUREKA_PORT: 8761
     ports:
       - "8082:8082"
+    networks:
+      - demo-network      
+    deploy:
+      restart_policy:
+        condition: any
+        
+networks:
+  demo-network:
+    external: true
