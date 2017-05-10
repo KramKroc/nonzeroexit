@@ -1,45 +1,143 @@
-# nonzeroexit
-Project that shows behaviour of an application when the discovery & config servers are not found, causing it to exit. Unfortunately it exits with an exit code of 0 when launched as a jar application.
+# Network Behaviour in Swarm
+
+The following docker stack consists of 3 containers:
+
+* Spring Cloud Discovery Server
+* Spring Cloud Config Server
+* Simple Spring Boot App that connects to discovery server to find config server.
+
+# Problem encountered
+
+When the config server registers with the discovery server, it does so with the ip address from the ingress network rather than the created demo-network. The simple boot application cannot hit that ip address on the ingress network and so it never comes online. 
 
 # Versions
 
-| Component | Version|
-|-----------|--------|
-| Docker Toolbox | 1.9.0 |
-| Spring Boot | 1.3.x.RELEASE  (versions greate than 1.3.1.RELEASE) |
+Spring Boot: 1.5.3 RELEASE
+Spring Cloud: Camden.SR6
+
+$ docker version
+Client:
+ Version:      17.03.1-ce
+ API version:  1.27
+ Go version:   go1.7.5
+ Git commit:   c6d412e
+ Built:        Tue Mar 28 00:40:02 2017
+ OS/Arch:      darwin/amd64
+
+Server:
+ Version:      17.05.0-ce
+ API version:  1.29 (minimum version 1.12)
+ Go version:   go1.7.5
+ Git commit:   89658be
+ Built:        Thu May  4 21:43:09 2017
+ OS/Arch:      linux/amd64
+ Experimental: false
+
+$ docker info
+Containers: 0
+ Running: 0
+ Paused: 0
+ Stopped: 0
+Images: 22
+Server Version: 17.05.0-ce
+Storage Driver: aufs
+ Root Dir: /mnt/sda1/var/lib/docker/aufs
+ Backing Filesystem: extfs
+ Dirs: 20
+ Dirperm1 Supported: true
+Logging Driver: json-file
+Cgroup Driver: cgroupfs
+Plugins:
+ Volume: local
+ Network: bridge host macvlan null overlay
+Swarm: active
+ NodeID: 9x7n5pnsq03ejs84snhn9py42
+ Is Manager: true
+ ClusterID: q2wj5xm2d72q7el58eawycz0y
+ Managers: 1
+ Nodes: 2
+ Orchestration:
+  Task History Retention Limit: 5
+ Raft:
+  Snapshot Interval: 10000
+  Number of Old Snapshots to Retain: 0
+  Heartbeat Tick: 1
+  Election Tick: 3
+ Dispatcher:
+  Heartbeat Period: 5 seconds
+ CA Configuration:
+  Expiry Duration: 3 months
+ Node Address: 192.168.99.101
+ Manager Addresses:
+  192.168.99.101:2377
+Runtimes: runc
+Default Runtime: runc
+Init Binary: docker-init
+containerd version: 9048e5e50717ea4497b757314bad98ea3763c145
+runc version: 9c2d8d184e5da67c95d601382adf14862e4f2228
+init version: 949e6fa
+Security Options:
+ seccomp
+  Profile: default
+Kernel Version: 4.4.66-boot2docker
+Operating System: Boot2Docker 17.05.0-ce (TCL 7.2); HEAD : 5ed2840 - Fri May  5 21:04:09 UTC 2017
+OSType: linux
+Architecture: x86_64
+CPUs: 1
+Total Memory: 995.8 MiB
+Name: myvm1
+ID: 7ROG:TY64:UKPU:IGKB:FFI4:5UXE:WFEJ:CNBQ:QWWJ:6YOV:WP4K:IWRX
+Docker Root Dir: /mnt/sda1/var/lib/docker
+Debug Mode (client): false
+Debug Mode (server): true
+ File Descriptors: 31
+ Goroutines: 133
+ System Time: 2017-05-10T21:43:25.495630861Z
+ EventsListeners: 0
+Username: kramkroc
+Registry: https://index.docker.io/v1/
+Labels:
+ provider=virtualbox
+Experimental: false
+Insecure Registries:
+ 127.0.0.0/8
+Live Restore Enabled: false
 
 # Build and Run
 
-In the root folder run the following command which will build your jars:
+Create two vms, although I only use one here:
 
 ```sh
-$ ./gradlew clean build
+docker-machine create myvm1
+docker-machine create myvm2
 ```
 
-After that you can start the sample-application using the following:
+Then set first to be the active one in docker-machine:
 
 ```sh
-$ java -jar sample-service/build/libs/sample-service-0.0.1-SNAPSHOT.jar
+eval $(docker-machine env myvm1)
 ```
 
-The application will attempt to start but fail and the java process will exit. To see the exit code from the java process run the following command (in linux/os-x):
-
+Create images on that vm using the following command in the root folder for this project:
 
 ```sh
-$ echo $?
+./gradlew buildDocker
 ```
 
-And you will see that the exit code is 0. 
-
-Note that if you run the following:
+Activate swarm mode:
 
 ```sh
-$ ./gradle sample-service:bootRun
+docker swarm init
 ```
 
-that the exit code there is correctly returned as 1. This indicates that the issue lies with the changes made here:
+Create overlay network for swarm:
 
-https://github.com/spring-projects/spring-boot/blob/v1.3.2.RELEASE/spring-boot-tools/spring-boot-loader/src/main/java/org/springframework/boot/loader/MainMethodRunner.java
+```sh
+docker network create -d overlay demo-network
+```
 
-If you regress to version 1.3.1.RELEASE (by modifying the springBootVersion property in the sample-service/build.gradle file) you will see that the exit code there is 1.
+Deploy the stack using the compose file:
 
+```
+docker stack deploy -c docker-compose.yml demostack
+```
