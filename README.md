@@ -16,6 +16,7 @@ Spring Boot: 1.5.3 RELEASE
 Spring Cloud: Camden.SR6
 
 $ docker version
+```sh
 Client:
  Version:      17.03.1-ce
  API version:  1.27
@@ -32,8 +33,10 @@ Server:
  Built:        Thu May  4 21:43:09 2017
  OS/Arch:      linux/amd64
  Experimental: false
+```
 
 $ docker info
+```sh
 Containers: 0
  Running: 0
  Paused: 0
@@ -102,6 +105,7 @@ Experimental: false
 Insecure Registries:
  127.0.0.0/8
 Live Restore Enabled: false
+```
 
 # Build and Run
 
